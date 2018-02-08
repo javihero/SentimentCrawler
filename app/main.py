@@ -50,7 +50,7 @@ class ScrapyCall(webapp2.RequestHandler):
 
     def post(self):
         url = self.request.get('url')
-        api_url = 'http://localhost:9080/crawl.json?spider_name=quoteurls&url=' + url
+        api_url = 'http://localhost:9080/crawl.json?spider_name=rss&url=' + url
 
         content = urllib2.urlopen(api_url).read()
         json_content = json.loads(content)

@@ -38,9 +38,10 @@
   <div class="container quotesblock">
     {% for item in content %}
     <hr>
-    <p>QUOTE -> {{item['quote'][0]}}</p>
-    <p>author -> {{item['author'][0]}}</p>
-    <p>tags -> {{item['tags'][0]}}</p>
+    <p>TITLE -> {{item['title']}}</p>
+    <p>LINK -> {{item['link']}}</p>
+    <p>PUBDATE -> {{item['pubDate']}}</p>
+    <p>DESCRIPTION -> {{item['description']}}</p>
     {% endfor %}
   </div>
   {% endif %}
