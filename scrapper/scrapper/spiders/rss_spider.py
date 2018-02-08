@@ -1,5 +1,3 @@
-import scrapy
-
 from scrapy.spiders import XMLFeedSpider
 
 

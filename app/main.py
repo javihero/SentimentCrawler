@@ -17,13 +17,11 @@
 
 # [START imports]
 import os
-
-from google.appengine.api import users
+import urllib2
+import json
 
 import jinja2
 import webapp2
-import urllib2
-import json
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -55,6 +53,8 @@ class ScrapyCall(webapp2.RequestHandler):
         content = urllib2.urlopen(api_url).read()
         json_content = json.loads(content)
         items = json_content['items']
+
+        print items
 
         template_values = {
             'content': items
