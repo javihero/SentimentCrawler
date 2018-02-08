@@ -3,3 +3,11 @@ body {
   padding-bottom: 40px;
   background-color: #f5f5f5;
 }
+
+.quotesblock {
+  margin-left: 0 auto
+}
+
+.button {
+  margin: 20px auto
+}

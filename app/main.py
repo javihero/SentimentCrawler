@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Copyright 2016 Google Inc.
 #
@@ -21,6 +22,8 @@ from google.appengine.api import users
 
 import jinja2
 import webapp2
+import urllib2
+import json
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -33,18 +36,8 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 class MainPage(webapp2.RequestHandler):
 
     def get(self):
-        user = users.get_current_user()
-        if user:
-            url = users.create_logout_url(self.request.uri)
-            url_linktext = 'Logout'
-        else:
-            url = users.create_login_url(self.request.uri)
-            url_linktext = 'Login'
-
         template_values = {
-            'user': user,
-            'url': url,
-            'url_linktext': url_linktext,
+            'content': ''
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -52,8 +45,29 @@ class MainPage(webapp2.RequestHandler):
 # [END main_page]
 
 
+# [START scrapy_call]
+class ScrapyCall(webapp2.RequestHandler):
+
+    def post(self):
+        url = self.request.get('url')
+        api_url = 'http://localhost:9080/crawl.json?spider_name=quoteurls&url=' + url
+
+        content = urllib2.urlopen(api_url).read()
+        json_content = json.loads(content)
+        items = json_content['items']
+
+        template_values = {
+            'content': items
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_values))
+# [END scrapy_call]
+
+
 # [START app]
 app = webapp2.WSGIApplication([
-    ('/', MainPage)
+    ('/', MainPage),
+    ('/scrap', ScrapyCall)
 ], debug=True)
 # [END app]

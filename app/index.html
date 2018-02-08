@@ -24,10 +24,25 @@
   </div>
 
   <div class="container">
-    <div>
-      <input type="submit" class="btn btn-large btn-primary" value="Start Crawler">
-    </div>
+    <form action="/scrap?url=http://quotes.toscrape.com/page/3" method="post">
+      <div class="button">
+        <input type="submit" class="btn btn-large btn-primary" value="Start Crawler">
+      </div>
+    </form>
   </div>
+
+
+  {% if content is defined %}
+  <div class="container quotesblock">
+    {% for item in content %}
+    <hr>
+    <p>QUOTE -> {{item['quote'][0]}}</p>
+    <p>author -> {{item['author'][0]}}</p>
+    <p>tags -> {{item['tags'][0]}}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
 </body>
 
 </html>
