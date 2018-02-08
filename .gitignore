@@ -3,4 +3,5 @@
 .vscode
 *.jl
 service-account-file.json
+/scrapper/logs
 
