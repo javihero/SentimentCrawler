@@ -2,6 +2,7 @@
 <html>
 
 <head>
+  <title>Scrapy Dashboard</title>
   <!-- [START css] -->
   <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
   <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap-responsive.css">
@@ -24,8 +25,9 @@
   </div>
 
   <div class="container">
-    <form action="/scrap?url=http://quotes.toscrape.com/page/3" method="post">
+    <form action="/scrap" method="post">
       <div class="button">
+        <input type="text" placeholder="Insert url to scrap" name="url" value="{{url}}">
         <input type="submit" class="btn btn-large btn-primary" value="Start Crawler">
       </div>
     </form>
