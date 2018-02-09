@@ -54,8 +54,6 @@ class ScrapyCall(webapp2.RequestHandler):
         json_content = json.loads(content)
         items = json_content['items']
 
-        print items
-
         template_values = {
             'content': items
         }

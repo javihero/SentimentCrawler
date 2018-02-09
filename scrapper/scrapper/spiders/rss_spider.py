@@ -1,5 +1,14 @@
 from scrapy.spiders import XMLFeedSpider
 
+import re
+import html
+
+
+def sanitize_content(data):
+    data = html.unescape(data)
+    p = re.compile(r'<.*?>')
+    return p.sub('', data)
+
 
 class Spider(XMLFeedSpider):
     name = "rss"
@@ -13,5 +22,8 @@ class Spider(XMLFeedSpider):
         item['title'] = node.xpath('title/text()',).extract_first()
         item['link'] = node.xpath('link/text()').extract_first()
         item['pubDate'] = node.xpath('pubDate/text()').extract_first()
-        item['description'] = node.xpath('description/text()').extract_first()
+
+        description = node.xpath('description/text()').extract_first()
+        item['description'] = sanitize_content(description)
+
         return item
