@@ -1,13 +1,5 @@
 from scrapy.spiders import XMLFeedSpider
-
-import re
-import html
-
-
-def sanitize_content(data):
-    data = html.unescape(data)
-    p = re.compile(r'<.*?>')
-    return p.sub('', data)
+from scrapper.helpers import sanitize_content
 
 
 class Spider(XMLFeedSpider):
