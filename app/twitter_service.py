@@ -5,19 +5,25 @@ Twitter API calls are made from here
 """
 
 from twitter_config import API_KEY, API_SECRET, OAUTH_KEY, OAUTH_SECRET
-import requests
-from requests_oauthlib import OAuth1
+import twitter
 
 
 class TwitterService():
-    base_url = 'https://api.twitter.com/1.1/'
-    auth_url = base_url + 'account/verify_credentials.json'
-    auth = OAuth1(API_KEY, API_SECRET,
-                  OAUTH_KEY, OAUTH_SECRET)
+    api = twitter.Api(consumer_key=API_KEY,
+                      consumer_secret=API_SECRET,
+                      access_token_key=OAUTH_KEY,
+                      access_token_secret=OAUTH_SECRET)
 
-    def get_tweets(self):
-        r = requests.get(
-            self.base_url + 'statuses/user_timeline.json?screen_name=stackoverflow&count=100', auth=self.auth)
+    def verify_credentials(self):
+        return self.api.VerifyCredentials()
 
-        for tweet in r.json():
-            print tweet['text']
+    def get_tweets_from(self, term):
+        info = []
+
+        result = self.api.GetSearch(
+            raw_query="q=from%3A" + term)
+
+        for status in result:
+            info.append(status)
+
+        return info

@@ -27,15 +27,22 @@
   <div class="container inputs">
     <form action="/rss" method="post">
       <div class="button input-append">
-        <input type="text" placeholder="Insert url to scrap" name="url" value="{{url}}">
+        <input type="text" placeholder="Insert url to scrap" name="url">
         <input type="submit" class="btn btn-primary" value="Start RSS Crawler">
       </div>
     </form>
 
     <form action="/atom" method="post">
       <div class="button input-append">
-        <input type="text" placeholder="Insert url to scrap" name="url" value="{{url}}">
+        <input type="text" placeholder="Insert url to scrap" name="url">
         <input type="submit" class="btn btn-primary" value="Start Atom Crawler">
+      </div>
+    </form>
+
+    <form action="/twitter" method="post">
+      <div class="button input-append">
+        <input type="text" placeholder="Insert term to search" name="term">
+        <input type="submit" class="btn btn-primary" value="Search tweets">
       </div>
     </form>
   </div>
@@ -49,6 +56,17 @@
     <p>LINK -> {{item['link']}}</p>
     <p>DATE -> {{item['date']}}</p>
     <p>DESCRIPTION -> {{item['description']}}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  </br>
+
+  {% if info is defined %}
+  <div class="container feed">
+    {% for item in info %}
+    <hr>
+    <p>{{item['text']}}</p>
     {% endfor %}
   </div>
   {% endif %}

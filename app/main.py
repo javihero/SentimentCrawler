@@ -40,10 +40,6 @@ class MainPage(webapp2.RequestHandler):
             'content': ''
         }
 
-        twitter = TwitterService()
-
-        twitter.get_tweets()
-
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 # [END main_page]
@@ -91,10 +87,29 @@ class ScrapyAtom(webapp2.RequestHandler):
 # [END scrapy_atom]
 
 
+# [START twitter]
+class RequestTwitter(webapp2.RequestHandler):
+
+    def post(self):
+        term = self.request.get('term')
+
+        twitter = TwitterService()
+        info = twitter.get_tweets_from(term)
+
+        template_values = {
+            'info': info
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_values))
+# [END twitter]
+
+
 # [START app]
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/rss', ScrapyRss),
-    ('/atom', ScrapyAtom)
+    ('/atom', ScrapyAtom),
+    ('/twitter', RequestTwitter)
 ], debug=True)
 # [END app]
