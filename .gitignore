@@ -4,4 +4,6 @@
 *.jl
 service-account-file.json
 /scrapper/logs
+twitter_config.py
+app/lib
 
