@@ -23,7 +23,7 @@ import json
 import jinja2
 import webapp2
 
-# from twitter_service import TwitterService
+from twitter_service import TwitterService
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -40,9 +40,9 @@ class MainPage(webapp2.RequestHandler):
             'content': ''
         }
 
-        # twitter = TwitterService()
+        twitter = TwitterService()
 
-        # twitter.get_tweets()
+        twitter.get_tweets()
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
