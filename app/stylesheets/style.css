@@ -11,3 +11,8 @@ body {
 .button {
   margin: 20px auto
 }
+
+.inputs {
+  display: flex;
+  justify-content: space-between
+}

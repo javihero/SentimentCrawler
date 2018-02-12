@@ -15,9 +15,9 @@ class BSpider(XMLFeedSpider):
         entry = {}
         entry['title'] = node.xpath('atom:title/text()',).extract_first()
         entry['link'] = node.xpath('atom:link/text()').extract_first()
-        entry['updated'] = node.xpath('atom:updated/text()').extract_first()
+        entry['date'] = node.xpath('atom:updated/text()').extract_first()
 
         content = node.xpath('atom:content/text()').extract_first()
-        entry['content'] = sanitize_content(content)
+        entry['description'] = sanitize_content(content)
 
         return entry

@@ -13,7 +13,7 @@ class Spider(XMLFeedSpider):
         item = {}
         item['title'] = node.xpath('title/text()',).extract_first()
         item['link'] = node.xpath('link/text()').extract_first()
-        item['pubDate'] = node.xpath('pubDate/text()').extract_first()
+        item['date'] = node.xpath('pubDate/text()').extract_first()
 
         description = node.xpath('description/text()').extract_first()
         item['description'] = sanitize_content(description)

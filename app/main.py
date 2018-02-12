@@ -23,6 +23,8 @@ import json
 import jinja2
 import webapp2
 
+# from twitter_service import TwitterService
+
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
@@ -38,13 +40,17 @@ class MainPage(webapp2.RequestHandler):
             'content': ''
         }
 
+        # twitter = TwitterService()
+
+        # twitter.get_tweets()
+
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 # [END main_page]
 
 
-# [START scrapy_call]
-class ScrapyCall(webapp2.RequestHandler):
+# [START scrapy_rss]
+class ScrapyRss(webapp2.RequestHandler):
 
     def post(self):
         url = self.request.get('url')
@@ -61,12 +67,34 @@ class ScrapyCall(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
-# [END scrapy_call]
+# [END scrapy_rss]
+
+
+# [START scrapy_atom]
+class ScrapyAtom(webapp2.RequestHandler):
+
+    def post(self):
+        url = self.request.get('url')
+        spider = 'atom'
+        api_url = 'http://localhost:9080/crawl.json?spider_name=' + spider + '&url=' + url
+
+        content = urllib2.urlopen(api_url).read()
+        json_content = json.loads(content)
+        items = json_content['items']
+
+        template_values = {
+            'content': items
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_values))
+# [END scrapy_atom]
 
 
 # [START app]
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/scrap', ScrapyCall)
+    ('/rss', ScrapyRss),
+    ('/atom', ScrapyAtom)
 ], debug=True)
 # [END app]

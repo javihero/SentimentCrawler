@@ -24,11 +24,18 @@
     </div>
   </div>
 
-  <div class="container">
-    <form action="/scrap" method="post">
+  <div class="container inputs">
+    <form action="/rss" method="post">
       <div class="button input-append">
         <input type="text" placeholder="Insert url to scrap" name="url" value="{{url}}">
-        <input type="submit" class="btn btn-primary" value="Start Crawler">
+        <input type="submit" class="btn btn-primary" value="Start RSS Crawler">
+      </div>
+    </form>
+
+    <form action="/atom" method="post">
+      <div class="button input-append">
+        <input type="text" placeholder="Insert url to scrap" name="url" value="{{url}}">
+        <input type="submit" class="btn btn-primary" value="Start Atom Crawler">
       </div>
     </form>
   </div>
@@ -40,7 +47,7 @@
     <hr>
     <p>TITLE -> {{item['title']}}</p>
     <p>LINK -> {{item['link']}}</p>
-    <p>PUBDATE -> {{item['pubDate']}}</p>
+    <p>DATE -> {{item['date']}}</p>
     <p>DESCRIPTION -> {{item['description']}}</p>
     {% endfor %}
   </div>
