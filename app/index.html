@@ -5,44 +5,42 @@
   <title>Scrapy Dashboard</title>
   <!-- [START css] -->
   <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
-  <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap-responsive.css">
   <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
   <!-- [END css] -->
 </head>
 
 <body>
-  <div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="brand" href="#">Sentiment Crawler</a>
-      </div>
+  <nav class="navbar navbar-dark bg-dark navbar-fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Sentiment Crawler</a>
     </div>
-  </div>
+  </nav>
 
   <div class="container inputs">
     <form action="/rss" method="post">
-      <div class="button input-append">
-        <input type="text" placeholder="Insert url to scrap" name="url">
-        <input type="submit" class="btn btn-primary" value="Start RSS Crawler">
+      <div class="button input-group">
+        <input type="text" class="form-control" placeholder="Insert url to scrap" name="url">
+        <div class="input-group-append">
+          <input type="submit" class="btn btn-primary" value="Start RSS Crawler">
+        </div>
       </div>
     </form>
 
     <form action="/atom" method="post">
-      <div class="button input-append">
-        <input type="text" placeholder="Insert url to scrap" name="url">
-        <input type="submit" class="btn btn-primary" value="Start Atom Crawler">
+      <div class="button input-group">
+        <input type="text" class="form-control" placeholder="Insert url to scrap" name="url">
+        <div class="input-group-append">
+          <input type="submit" class="btn btn-primary" value="Start Atom Crawler">
+        </div>
       </div>
     </form>
 
     <form action="/twitter" method="post">
-      <div class="button input-append">
-        <input type="text" placeholder="Insert term to search" name="term">
-        <input type="submit" class="btn btn-primary" value="Search tweets">
+      <div class="button input-group">
+        <input type="text" class="form-control" placeholder="Insert term to search" name="term">
+        <div class="input-group-append">
+          <input type="submit" class="btn btn-primary" value="Search tweets">
+        </div>
       </div>
     </form>
   </div>
