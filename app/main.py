@@ -87,6 +87,28 @@ class ScrapyAtom(webapp2.RequestHandler):
 # [END scrapy_atom]
 
 
+# [START scrapy_web]
+class ScrapyWeb(webapp2.RequestHandler):
+
+    def post(self):
+        url = self.request.get('url')
+        spider = 'web'
+        api_url = 'http://localhost:9080/crawl.json?spider_name=' + spider + '&url=' + url
+
+        content = urllib2.urlopen(api_url).read()
+        json_content = json.loads(content)
+        print json_content
+        info = json_content['items']
+
+        template_values = {
+            'info': info
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_values))
+# [END scrapy_web]
+
+
 # [START twitter]
 class RequestTwitter(webapp2.RequestHandler):
 
@@ -110,6 +132,7 @@ app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/rss', ScrapyRss),
     ('/atom', ScrapyAtom),
+    ('/web', ScrapyWeb),
     ('/twitter', RequestTwitter)
 ], debug=True)
 # [END app]

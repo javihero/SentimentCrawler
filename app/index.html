@@ -34,12 +34,23 @@
         </div>
       </div>
     </form>
+  </div>
+
+  <div class="container inputs">
+    <form action="/web" method="post">
+      <div class="button input-group">
+        <input type="text" class="form-control" placeholder="Insert url to scrap" name="url">
+        <div class="input-group-append">
+          <input type="submit" class="btn btn-info" value="Start Web Crawler">
+        </div>
+      </div>
+    </form>
 
     <form action="/twitter" method="post">
       <div class="button input-group">
-        <input type="text" class="form-control" placeholder="Insert term to search" name="term">
+        <input type="text" class="form-control" placeholder="Insert account to search" name="term">
         <div class="input-group-append">
-          <input type="submit" class="btn btn-info" value="Search tweets">
+          <input type="submit" class="btn btn-info" value="Search for tweets">
         </div>
       </div>
     </form>
@@ -64,7 +75,7 @@
   <div class="container feed">
     {% for item in info %}
     <hr>
-    <p>{{item['text']}}</p>
+    <p>TEXT -> {{item['text']}}</p>
     {% endfor %}
   </div>
   {% endif %}
