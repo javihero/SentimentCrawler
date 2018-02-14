@@ -19,4 +19,4 @@ class TwitterService():
         return self.api.VerifyCredentials()
 
     def get_tweets_from(self, term):
-        return self.api.GetUserTimeline(screen_name=term, count=100, exclude_replies=True)
+        return self.api.GetUserTimeline(screen_name=term, count=100, exclude_replies=True, include_rts=False)
