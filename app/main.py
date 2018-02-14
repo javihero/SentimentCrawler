@@ -97,7 +97,6 @@ class ScrapyWeb(webapp2.RequestHandler):
 
         content = urllib2.urlopen(api_url).read()
         json_content = json.loads(content)
-        print json_content
         info = json_content['items']
 
         template_values = {
