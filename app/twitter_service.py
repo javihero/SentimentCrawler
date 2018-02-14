@@ -20,8 +20,11 @@ class TwitterService():
     def get_tweets_from(self, term):
         info = []
 
-        result = self.api.GetSearch(
-            raw_query="q=from%3A" + term)
+        # result = self.api.GetSearch(
+        # raw_query="q=from%3A" + term)
+
+        result = self.api.GetUserTimeline(
+            screen_name=term, count=100, exclude_replies=True)
 
         for status in result:
             info.append(status)
