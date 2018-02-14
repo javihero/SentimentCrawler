@@ -7,18 +7,10 @@ class WebSpider(scrapy.Spider):
     start_urls = ['https://doc.scrapy.org/en/latest/intro/overview.html']
 
     def parse(self, response):
-        result_list = []
         text_nodes = response.xpath(
-            '//body//text()[not(parent::script)]').extract()
+            '//body//text()[normalize-space() and not(parent::script | parent::style | parent::a)]').extract()
 
-        text_list = ('\n'.join(text_nodes)).splitlines()
-        text_list = filter(lambda a: a != '', text_list)
-
-        for line in text_list:
-            if not line.isspace():
-                result_list.append(line.strip())
-
-        formatted_text = (' '.join(result_list))
+        formatted_text = (' '.join(text_nodes))
         phrases = formatted_text.split('. ')
 
         for p in phrases:
