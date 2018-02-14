@@ -4,7 +4,6 @@ import scrapy
 
 class WebSpider(scrapy.Spider):
     name = 'web'
-    start_urls = ['https://doc.scrapy.org/en/latest/intro/overview.html']
 
     def parse(self, response):
         xpath = '//body//text()[normalize-space() and not(parent::script | parent::style | parent::a)]'
