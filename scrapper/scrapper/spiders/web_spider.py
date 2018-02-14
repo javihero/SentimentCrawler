@@ -8,7 +8,8 @@ class WebSpider(scrapy.Spider):
 
     def parse(self, response):
         result_list = []
-        text_nodes = response.xpath('//text()').extract()
+        text_nodes = response.xpath(
+            '//text()[not(parent::script)]').extract()
 
         text_list = ('\n'.join(text_nodes)).splitlines()
         text_list = filter(lambda a: a != '', text_list)
