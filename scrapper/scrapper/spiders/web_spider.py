@@ -7,8 +7,8 @@ class WebSpider(scrapy.Spider):
     start_urls = ['https://doc.scrapy.org/en/latest/intro/overview.html']
 
     def parse(self, response):
-        text_nodes = response.xpath(
-            '//body//text()[normalize-space() and not(parent::script | parent::style | parent::a)]').extract()
+        xpath = '//body//text()[normalize-space() and not(parent::script | parent::style | parent::a)]'
+        text_nodes = response.xpath(xpath).extract()
 
         formatted_text = (' '.join(text_nodes))
         phrases = formatted_text.split('. ')
