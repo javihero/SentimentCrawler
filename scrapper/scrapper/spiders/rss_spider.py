@@ -2,7 +2,7 @@ from scrapy.spiders import XMLFeedSpider
 from scrapper.helpers import sanitize_content
 
 
-class Spider(XMLFeedSpider):
+class RssSpider(XMLFeedSpider):
     name = "rss"
     itertag = 'item'
 

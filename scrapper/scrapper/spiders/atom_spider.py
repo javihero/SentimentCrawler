@@ -2,7 +2,7 @@ from scrapy.spiders import XMLFeedSpider
 from scrapper.helpers import sanitize_content
 
 
-class BSpider(XMLFeedSpider):
+class AtomSpider(XMLFeedSpider):
     name = "atom"
     namespaces = [('atom', 'http://www.w3.org/2005/Atom')]
     iterator = 'xml'
