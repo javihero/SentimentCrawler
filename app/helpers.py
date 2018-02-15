@@ -1,3 +1,7 @@
+import urllib2
+import json
+
+"""
 # Import the Google Cloud BigQuery Library
 from google.cloud import bigquery
 
@@ -26,3 +30,18 @@ def send_result_to_bq(source_file_name):
 
     print('Loaded {} rows into {}:{}.'.format(
         job.output_rows, dataset_name, table_id))
+"""
+
+
+def sanitize_url(old_url):
+    if not old_url.startswith(('http://', 'https://')):
+        new_url = 'http://' + old_url
+        return new_url
+    else:
+        return old_url
+
+
+def request_scrapy(api_url):
+    content = urllib2.urlopen(api_url).read()
+    json_content = json.loads(content)
+    return json_content['items']

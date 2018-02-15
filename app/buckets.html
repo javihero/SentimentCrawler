@@ -51,17 +51,21 @@
         </div>
       </div>
     </form>
+    {% if result is defined %}
     <div>
-      {% if brand_selected is defined %}
-      <p>Marca Seleccionada: {{brand_selected}}</p>{% endif %} {% if medio_selected is defined %}
-      <p>Medio Seleccionado: {{medio_selected}}</p>{% endif %} {% if kind_selected is defined %}
-      <p>Tipo Seleccionado: {{kind_selected}}</p>{% endif %}
+      {% for info in result %}
+      <h3>{{info['url']}}</h3>
+      <hr> {% for line in info['text'] %} {% if (info['type'] == 'rss' or info['type'] == 'atom') %}
+      <p>TITLE -> {{line['title']}}</p>
+      <p>LINK -> {{line['link']}}</p>
+      <p>DATE -> {{line['date']}}</p>
+      <p>DESCRIPTION -> {{line['description']}}</p>
+      {% elif (info['type'] == 'web' or info['type'] == 'twitter') %}
+      <p>TEXT -> {{line['text']}}</p>
+      {% endif %}
+      <hr> {% endfor %} {% endfor %}
     </div>
-    <div>
-      {% if urls is defined %} {% for url in urls %}
-      <p>{{url}}</p>
-      {% endfor %} {% endif %}
-    </div>
+    {% endif %}
   </div>
 
 </body>

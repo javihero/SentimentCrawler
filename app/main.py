@@ -17,8 +17,6 @@
 
 # [START imports]
 import os
-import urllib2
-import json
 
 import jinja2
 import webapp2
@@ -29,6 +27,7 @@ import csv
 import cloudstorage as gcs
 
 from twitter_service import TwitterService
+from helpers import sanitize_url, request_scrapy
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -44,6 +43,15 @@ my_default_retry_params = gcs.RetryParams(initial_delay=0.2,
                                           max_retry_period=15)
 gcs.set_default_retry_params(my_default_retry_params)
 # [END retries]
+
+
+# [START Scrapy URL]
+local_url = 'http://localhost:9080'
+exposed_url = 'http://f4b59422.ngrok.io'
+cloud_url = ''  # Final URL when it is deployed
+
+current_url = exposed_url
+# [END Scrapy URL]
 
 
 # [START main_page]
@@ -64,12 +72,11 @@ class ScrapyRss(webapp2.RequestHandler):
 
     def post(self):
         url = self.request.get('url')
+        url = sanitize_url(url)
         spider = 'rss'
-        api_url = 'http://localhost:9080/crawl.json?spider_name=' + spider + '&url=' + url
+        api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
 
-        content = urllib2.urlopen(api_url).read()
-        json_content = json.loads(content)
-        items = json_content['items']
+        items = request_scrapy(api_url)
 
         template_values = {
             'content': items
@@ -85,12 +92,11 @@ class ScrapyAtom(webapp2.RequestHandler):
 
     def post(self):
         url = self.request.get('url')
+        url = sanitize_url(url)
         spider = 'atom'
-        api_url = 'http://localhost:9080/crawl.json?spider_name=' + spider + '&url=' + url
+        api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
 
-        content = urllib2.urlopen(api_url).read()
-        json_content = json.loads(content)
-        items = json_content['items']
+        items = request_scrapy(api_url)
 
         template_values = {
             'content': items
@@ -106,12 +112,11 @@ class ScrapyWeb(webapp2.RequestHandler):
 
     def post(self):
         url = self.request.get('url')
+        url = sanitize_url(url)
         spider = 'web'
-        api_url = 'http://localhost:9080/crawl.json?spider_name=' + spider + '&url=' + url
+        api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
 
-        content = urllib2.urlopen(api_url).read()
-        json_content = json.loads(content)
-        info = json_content['items']
+        info = request_scrapy(api_url)
 
         template_values = {
             'info': info
@@ -146,28 +151,26 @@ class CloudStorage(webapp2.RequestHandler):
     buck_name = 'urlbucket'
     brands_file_name = 'brands.csv'
     media_file_name = 'medios.csv'
+    bucket_name = os.environ.get('BUCKET_NAME', buck_name)
+    kinds = ['website', 'rss', 'twitter']
+
+    bucket = '/' + bucket_name
+    brands_filename = bucket + '/' + brands_file_name
+    media_filename = bucket + '/' + media_file_name
+    tmp_filenames_to_clean_up = []
 
     def get(self):
 
-        bucket_name = os.environ.get('BUCKET_NAME', self.buck_name)
-
-        kinds = ['website', 'rss', 'twitter']
-
-        bucket = '/' + bucket_name
-        brands_filename = bucket + '/' + self.brands_file_name
-        media_filename = bucket + '/' + self.media_file_name
-        self.tmp_filenames_to_clean_up = []
-
         try:
-            brands = self.read_file(brands_filename)
-            medios = self.read_file(media_filename)
+            brands = self.read_file(self.brands_filename)
+            medios = self.read_file(self.media_filename)
         except Exception, e:
             self.response.write(e)
 
         template_values = {
             'brands': brands,
             'medios': medios,
-            'tipos': kinds
+            'tipos': self.kinds
         }
 
         template = JINJA_ENVIRONMENT.get_template('buckets.html')
@@ -175,22 +178,13 @@ class CloudStorage(webapp2.RequestHandler):
 
     def post(self):
 
-        bucket_name = os.environ.get('BUCKET_NAME', self.buck_name)
-
-        kinds = ['website', 'rss', 'twitter']
-
-        bucket = '/' + bucket_name
-        brands_filename = bucket + '/' + self.brands_file_name
-        media_filename = bucket + '/' + self.media_file_name
-        self.tmp_filenames_to_clean_up = []
-
         try:
-            brands = self.read_file(brands_filename)
-            medios = self.read_file(media_filename)
+            brands = self.read_file(self.brands_filename)
+            medios = self.read_file(self.media_filename)
         except Exception, e:
             self.response.write(e)
 
-        brand_selected = self.request.get('brand')
+        # brand_selected = self.request.get('brand')
         medio_selected = self.request.get('medio')
         kind_selected = self.request.get('kind')
 
@@ -200,26 +194,47 @@ class CloudStorage(webapp2.RequestHandler):
 
         if (kind_selected == 'website'):
             url_file_name = 'website.csv'
+            spider = 'web'
         elif (kind_selected == 'rss'):
             url_file_name = 'rss.csv'
+            spider = 'rss'
         else:
             url_file_name = 'twitter.csv'
 
-        url_filename = bucket + '/' + url_file_name
+        url_filename = self.bucket + '/' + url_file_name
 
         try:
             urls = self.read_urls_file(url_filename, medio_selected)
         except Exception, e:
             self.response.write(e)
 
+        # Request loop
+
+        result = []
+        for url in urls:
+            info = {}
+            info['url'] = url
+
+            if kind_selected == 'twitter':
+                twitter = TwitterService()
+                response = twitter.get_tweets_from(url)
+                info['type'] = 'twitter'
+            else:
+                api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
+                response = request_scrapy(api_url)
+                info['type'] = spider
+
+            info['text'] = response
+
+            result.append(info)
+
+        # Render result
+
         template_values = {
             'brands': brands,
             'medios': medios,
-            'tipos': kinds,
-            'brand_selected': brand_selected,
-            'medio_selected': medio_selected,
-            'kind_selected': kind_selected,
-            'urls': urls
+            'tipos': self.kinds,
+            'result': result
         }
 
         template = JINJA_ENVIRONMENT.get_template('buckets.html')
