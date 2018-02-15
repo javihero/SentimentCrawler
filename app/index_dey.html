@@ -1,0 +1,74 @@
+<!DOCTYPE html> {% autoescape true %}
+<html>
+
+<head>
+    <!-- [START css] -->
+    <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap-responsive.css">
+    <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
+    <!-- [END css] -->
+</head>
+
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+                <a class="brand" href="#">Sentiment Crawler</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <form action="/readbrands" method="post">
+            {% if brands is defined %}
+            <div class="select-brand">
+                <h3>Selecciona la marca</h3>
+                <select name="brand">
+                  {% for brand in brands %}
+                  <option value="{{brand}}">{{brand}}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            {% endif %} {% if medios is defined %}
+            <div class="select-media">
+                <h3>Selecciona el medio</h3>
+                <select name="medio">
+                {% for medio in medios %}
+                  <option value="{{medio}}">{{medio}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            {% endif %} {% if tipos is defined %}
+            <div class="select-kind">
+                <h3>Selecciona el tipo</h3>
+                <select name="kind">
+                {% for tipo in tipos %}
+                  <option value="{{tipo}}">{{tipo}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+            <div class="button-submit">
+                <input type="submit" class="btn btn-large btn-primary" value="Submit">
+            </div>
+        </form>
+        <div>
+            <p>Marca Seleccionada: {{brand_selected}}</p>
+            <p>Medio Seleccionado: {{medio_selected}}</p>
+            <p>Tipo Seleccionado: {{kind_selected}}</p>
+        </div>
+        <div>
+            {% for url in urls %}
+            <p>{{url}}</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+</html>
+{% endautoescape %}
