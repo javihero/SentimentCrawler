@@ -47,10 +47,9 @@ gcs.set_default_retry_params(my_default_retry_params)
 
 # [START Scrapy URL]
 local_url = 'http://localhost:9080'
-exposed_url = 'http://f4b59422.ngrok.io'
-cloud_url = ''  # Final URL when it is deployed
+cloud_url = 'http://35.197.243.127'
 
-current_url = exposed_url
+current_url = cloud_url
 # [END Scrapy URL]
 
 
