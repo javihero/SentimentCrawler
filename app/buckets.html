@@ -1,0 +1,70 @@
+<!DOCTYPE html> {% autoescape true %}
+<html>
+
+<head>
+  <title>Scrapy Dashboard</title>
+  <!-- [START css] -->
+  <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+  <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
+  <!-- [END css] -->
+</head>
+
+<body>
+  <nav class="navbar navbar-dark bg-dark navbar-fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="/">Sentiment Crawler</a>
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/gcs">Search buckets</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <form action="/gcs" method="post">
+      <div class="select-group">
+        <div class="input-group">
+          {% if brands is defined %}
+          <select class="custom-select" name="brand">
+            <option selected>Select the brand</option>
+            {% for brand in brands %}
+            <option value="{{brand}}">{{brand}}</option>
+            {% endfor %}
+          </select>
+          {% endif %} {% if medios is defined %}
+          <select class="custom-select" name="medio">
+            <option selected>Select the media</option>
+            {% for medio in medios %}
+            <option value="{{medio}}">{{medio}}</option>
+            {% endfor %}
+          </select>
+          {% endif %} {% if tipos is defined %}
+          <select class="custom-select" name="kind">
+            <option selected>Select the type</option>
+            {% for tipo in tipos %}
+            <option value="{{tipo}}">{{tipo}}</option>
+            {% endfor %}
+          </select>
+          {% endif %}
+          <div class="input-group-append">
+            <input type="submit" class="btn btn-info" value="Submit">
+          </div>
+        </div>
+      </div>
+    </form>
+    <div>
+      {% if brand_selected is defined %}
+      <p>Marca Seleccionada: {{brand_selected}}</p>{% endif %} {% if medio_selected is defined %}
+      <p>Medio Seleccionado: {{medio_selected}}</p>{% endif %} {% if kind_selected is defined %}
+      <p>Tipo Seleccionado: {{kind_selected}}</p>{% endif %}
+    </div>
+    <div>
+      {% if urls is defined %} {% for url in urls %}
+      <p>{{url}}</p>
+      {% endfor %} {% endif %}
+    </div>
+  </div>
+
+</body>
+
+</html>
+{% endautoescape %}

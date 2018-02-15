@@ -16,6 +16,10 @@ body {
   min-width: 160px;
 }
 
+.select-group {
+  margin: 20px auto;
+}
+
 .inputs {
   display: flex;
   justify-content: space-between
