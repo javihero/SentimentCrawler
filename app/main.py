@@ -28,6 +28,7 @@ import cloudstorage as gcs
 
 from twitter_service import TwitterService
 from helpers import sanitize_url, request_scrapy
+from bigquery_service import send_scrapper_result_to_bq
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -226,6 +227,9 @@ class CloudStorage(webapp2.RequestHandler):
             info['text'] = response
 
             result.append(info)
+
+        
+        send_scrapper_result_to_bq('../scrapper/result.jl')
 
         # Render result
 

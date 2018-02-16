@@ -2,10 +2,10 @@
 from google.cloud import bigquery
 
 
-def send_result_to_bq(source_file_name):
+def send_scrapper_result_to_bq(source_file_name):
 
-    dataset_name = 'sentiment'
-    table_id = 'quotes_table'
+    dataset_name = 'sentimentcrawlerdataset'
+    table_id = 'scrapper_table'
 
     bigquery_client = bigquery.Client()
     dataset_ref = bigquery_client.dataset(dataset_name)
