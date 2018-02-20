@@ -1,16 +1,10 @@
 from scrapy.spiders import XMLFeedSpider
 from scrapper.helpers import sanitize_content
-import os
+
 
 class RssSpider(XMLFeedSpider):
     name = "rss"
     itertag = 'item'
-
-    def __init__(self):
-        try:
-            os.remove('result.jl')
-        except OSError:
-            pass
 
     def parse_node(self, response, node):
         self.logger.info('Hi, this is a <%s> node!: %s',
