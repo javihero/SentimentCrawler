@@ -1,20 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2016 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 # [START imports]
 import os
 
@@ -27,8 +13,9 @@ import csv
 import cloudstorage as gcs
 
 from twitter_service import TwitterService
+from natural_service import NaturalService
 from helpers import sanitize_url, request_scrapy
-from bigquery_service import send_scrapper_result_to_bq
+# from bigquery_service import send_scrapper_result_to_bq
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -145,6 +132,30 @@ class RequestTwitter(webapp2.RequestHandler):
 # [END twitter]
 
 
+# [START natural_language]
+class RequestNaturalLanguage(webapp2.RequestHandler):
+
+    def get(self):
+        template_values = {}
+
+        template = JINJA_ENVIRONMENT.get_template('natural.html')
+        self.response.write(template.render(template_values))
+
+    def post(self):
+        text = self.request.get('text')
+
+        natural = NaturalService()
+        response = natural.request_sentiment(text)
+
+        template_values = {
+            'content': response
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('natural.html')
+        self.response.write(template.render(template_values))
+# [END natural_language]
+
+
 # [START read brands, media and kind]
 class CloudStorage(webapp2.RequestHandler):
 
@@ -228,8 +239,7 @@ class CloudStorage(webapp2.RequestHandler):
 
             result.append(info)
 
-        
-        send_scrapper_result_to_bq('../scrapper/result.jl')
+        # send_scrapper_result_to_bq('../scrapper/result.jl')
 
         # Render result
 
@@ -268,6 +278,7 @@ app = webapp2.WSGIApplication([
     ('/atom', ScrapyAtom),
     ('/web', ScrapyWeb),
     ('/twitter', RequestTwitter),
-    ('/gcs', CloudStorage)
+    ('/gcs', CloudStorage),
+    ('/natural', RequestNaturalLanguage)
 ], debug=True)
 # [END app]

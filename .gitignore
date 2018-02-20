@@ -5,6 +5,7 @@
 service-account-file.json
 /scrapper/logs
 twitter_config.py
+natural_config.py
 app/lib
 appenv
 

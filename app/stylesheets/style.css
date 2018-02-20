@@ -24,3 +24,7 @@ body {
   display: flex;
   justify-content: space-between
 }
+
+.textarea {
+  margin: 20px auto;
+}

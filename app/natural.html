@@ -1,0 +1,49 @@
+<!DOCTYPE html> {% autoescape true %}
+<html>
+
+<head>
+  <title>Scrapy Dashboard</title>
+  <!-- [START css] -->
+  <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+  <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
+  <!-- [END css] -->
+</head>
+
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">Sentiment Crawler</a>
+      <a class="navbar-brand" href="/gcs">Search buckets</a>
+      <a class="navbar-brand" href="/natural">Analyze Sentiment</a>
+    </div>
+  </nav>
+
+  <div class="container inputs">
+    <form action="/natural" method="post">
+      <div class="textarea input-group">
+        <textarea rows="4" cols="100" class="form-control" placeholder="Insert text to analyze" name="text"></textarea>
+        <div class="input-group-append">
+          <input type="submit" class="btn btn-info" value="Start Sentiment Analysis">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {% if content is defined %}
+  <div class="container feed">
+    <p>Text -> {{content['text']}}</p>
+    <p>Score -> {{content['score']}}</p>
+    <p>Magnitude -> {{content['magnitude']}}</p>
+    {% for sentence in content['sentences'] %}
+    <hr>
+    <p>- Sentence -> {{sentence['text']['content']}}</p>
+    <p>-- Score -> {{sentence['sentiment']['score']}}</p>
+    <p>-- Magnitude -> {{sentence['sentiment']['magnitude']}}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</body>
+
+</html>
+{% endautoescape %}
