@@ -8,14 +8,19 @@ import jinja2
 import webapp2
 
 import csv
+import json
 
 # Import the Google Cloud Storage Library
 import cloudstorage as gcs
 
-from twitter_service import TwitterService
 from natural_service import NaturalService
-from helpers import sanitize_url, request_scrapy
-# from bigquery_service import send_scrapper_result_to_bq
+#from twitter_service import TwitterService
+from helpers import sanitize_url, request_scrapy, send_to_bq_task
+from bigquery_service import send_scrapper_result_to_bigquery
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -45,6 +50,7 @@ current_url = cloud_url
 class MainPage(webapp2.RequestHandler):
 
     def get(self):
+        
         template_values = {
             'content': ''
         }
@@ -64,6 +70,10 @@ class ScrapyRss(webapp2.RequestHandler):
         api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
 
         items = request_scrapy(api_url)
+
+        for item in items:
+            #send_scrapper_result_to_bigquery(json.dumps(item))
+            send_to_bq_task(item)
 
         template_values = {
             'content': items
@@ -238,8 +248,6 @@ class CloudStorage(webapp2.RequestHandler):
             info['text'] = response
 
             result.append(info)
-
-        # send_scrapper_result_to_bq('../scrapper/result.jl')
 
         # Render result
 
