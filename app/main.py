@@ -72,8 +72,8 @@ class ScrapyRss(webapp2.RequestHandler):
         items = request_scrapy(api_url)
 
         for item in items:
-            #send_scrapper_result_to_bigquery(json.dumps(item))
-            send_to_bq_task(item)
+            send_scrapper_result_to_bigquery(json.dumps(item))
+            #send_to_bq_task(item)
 
         template_values = {
             'content': items
