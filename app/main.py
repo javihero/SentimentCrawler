@@ -14,7 +14,7 @@ import json
 import cloudstorage as gcs
 
 from natural_service import NaturalService
-#from twitter_service import TwitterService
+from twitter_service import TwitterService
 from helpers import sanitize_url, request_scrapy, send_to_bq_task
 from bigquery_service import send_scrapper_result_to_bigquery
 
