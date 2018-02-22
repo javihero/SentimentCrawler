@@ -15,12 +15,6 @@ class TwitterService():
                       access_token_key=OAUTH_KEY,
                       access_token_secret=OAUTH_SECRET)
 
-    def get_tweets_from(self, term):
-        """
-        Get full timeline from an account (without @)
-        """
-        return self.api.GetUserTimeline(screen_name=term, count=100, exclude_replies=True, include_rts=False)
-
     def search_tweets(self, term):
         """
         Bare search (can search keywords, hashtags, etc)
