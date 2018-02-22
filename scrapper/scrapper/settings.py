@@ -16,6 +16,9 @@ NEWSPIDER_MODULE = 'scrapper.spiders'
 
 FEED_EXPORT_ENCODING = 'utf-8'
 
+DEPTH_LIMIT = 3  # Crawling depth, will stop at 3rd level
+AUTOTHROTTLE_ENABLED = True  # This will prevent aggressive crawling
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scrapper (+http://www.yourdomain.com)'
