@@ -2,46 +2,64 @@
 <html>
 
 <head>
-  <title>Scrapy Dashboard</title>
-  <!-- [START css] -->
-  <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
-  <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
-  <!-- [END css] -->
+    <title>Scrapy Dashboard</title>
+    <!-- [START css] -->
+    <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
+    <!-- [END css] -->
 </head>
 
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="/">Sentiment Crawler</a>
-      <a class="navbar-brand" href="/gcs">Search buckets</a>
-      <a class="navbar-brand" href="/natural">Analyze Sentiment</a>
-    </div>
-  </nav>
-
-  <div class="container inputs">
-    <form action="/natural" method="post">
-      <div class="textarea input-group">
-        <textarea rows="4" cols="100" class="form-control" placeholder="Insert text to analyze" name="text"></textarea>
-        <div class="input-group-append">
-          <input type="submit" class="btn btn-info" value="Start Sentiment Analysis">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Sentiment Crawler</a>
+            <a class="navbar-brand" href="/gcs">Search buckets</a>
+            <a class="navbar-brand" href="/natural">Analyze Sentiment</a>
         </div>
-      </div>
-    </form>
-  </div>
+    </nav>
 
-  {% if content is defined %}
-  <div class="container feed">
-    <p>Text -> {{content['text']}}</p>
-    <p>Score -> {{content['score']}}</p>
-    <p>Magnitude -> {{content['magnitude']}}</p>
-    {% for sentence in content['sentences'] %}
-    <hr>
-    <p>- Sentence -> {{sentence['text']['content']}}</p>
-    <p>-- Score -> {{sentence['sentiment']['score']}}</p>
-    <p>-- Magnitude -> {{sentence['sentiment']['magnitude']}}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
+    <div class="container inputs">
+        <form action="/natural" method="post">
+            <div class="select-group">
+                <div class="textarea">
+                    {% if dict_datasets_tables is defined %}
+                    <select class="custom-select" name="dataset-table">
+                        <option disabled selected>Select the dataset table</option>
+                        {% for dataset, tables in dict_datasets_tables.items() %}
+                        <optgroup label="{{dataset}}">
+                            {% for table in tables %}
+                            <option value="{{dataset}};{{table}}">{{table}}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select> {% endif %}
+                    <div class="input-group-append">
+                        <input type="submit" class="btn btn-info" value="Start Sentiment Analysis">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if dataset_table_selected is defined %}
+    <p>DATASET TABLE SELECTED: {{dataset_table_selected}}</p>
+    {% endif %} {% if dataset_selected is defined %}
+    <p>DATASET SELECTED: {{dataset_selected}}</p>
+    {% endif %} {% if table_selected is defined %}
+    <p>TABLE SELECTED: {{table_selected}}</p>
+    {% endif %} {% if content is defined %}
+    <div class="container feed">
+        <p>Text -> {{content['text']}}</p>
+        <p>Score -> {{content['score']}}</p>
+        <p>Magnitude -> {{content['magnitude']}}</p>
+        {% for sentence in content['sentences'] %}
+        <hr>
+        <p>- Sentence -> {{sentence['text']['content']}}</p>
+        <p>-- Score -> {{sentence['sentiment']['score']}}</p>
+        <p>-- Magnitude -> {{sentence['sentiment']['magnitude']}}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
 
 </body>
 
