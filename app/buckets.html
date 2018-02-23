@@ -2,70 +2,61 @@
 <html>
 
 <head>
-  <title>Scrapy Dashboard</title>
-  <!-- [START css] -->
-  <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
-  <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
-  <!-- [END css] -->
+    <title>Scrapy Dashboard</title>
+    <!-- [START css] -->
+    <link type="text/css" rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="/stylesheets/style.css">
+    <!-- [END css] -->
 </head>
 
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="/">Sentiment Crawler</a>
-      <a class="navbar-brand" href="/gcs">Search buckets</a>
-      <a class="navbar-brand" href="/natural">Analyze Sentiment</a>
-    </div>
-  </nav>
-
-  <div class="container">
-    <form action="/gcs" method="post">
-      <div class="select-group">
-        <div class="input-group">
-          {% if brands is defined %}
-          <select class="custom-select" name="brand">
-            <option selected>Select the brand</option>
-            {% for brand in brands %}
-            <option value="{{brand}}">{{brand}}</option>
-            {% endfor %}
-          </select>
-          {% endif %} {% if medios is defined %}
-          <select class="custom-select" name="medio">
-            <option selected>Select the media</option>
-            {% for medio in medios %}
-            <option value="{{medio}}">{{medio}}</option>
-            {% endfor %}
-          </select>
-          {% endif %} {% if tipos is defined %}
-          <select class="custom-select" name="kind">
-            <option selected>Select the type</option>
-            {% for tipo in tipos %}
-            <option value="{{tipo}}">{{tipo}}</option>
-            {% endfor %}
-          </select>
-          {% endif %}
-          <div class="input-group-append">
-            <input type="submit" class="btn btn-info" value="Submit">
-          </div>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Sentiment Crawler</a>
+            <a class="navbar-brand" href="/gcs">Search buckets</a>
+            <a class="navbar-brand" href="/natural">Analyze Sentiment</a>
         </div>
-      </div>
-    </form>
-    {% if result is defined %}
-    <div>
-      {% for info in result %}
-      <h3>{{info['url']}}</h3>
-      <hr> {% for line in info['text'] %} {% if (info['type'] == 'rss' or info['type'] == 'atom') %}
-      <p>TITLE -> {{line['title']}}</p>
-      <p>LINK -> {{line['link']}}</p>
-      <p>DATE -> {{line['date']}}</p>
-      <p>DESCRIPTION -> {{line['description']}}</p>
-      {% elif (info['type'] == 'web' or info['type'] == 'twitter') %}
-      <p>TEXT -> {{line['text']}}</p>
-      {% endif %}
-      <hr> {% endfor %} {% endfor %}
+    </nav>
+
+    <div class="container">
+        <form action="/gcs" method="post">
+            <div class="select-group">
+                <div class="input-group">
+                    {% if medios is defined %}
+                    <select class="custom-select" name="medio">
+                      <option selected>Select the media</option>
+                      {% for medio in medios %}
+                      <option value="{{medio}}">{{medio}}</option>
+                      {% endfor %}
+                    </select> {% endif %} {% if tipos is defined %}
+                    <select class="custom-select" name="kind">
+                      <option selected>Select the type</option>
+                      {% for tipo in tipos %}
+                      <option value="{{tipo}}">{{tipo}}</option>
+                      {% endfor %}
+                    </select> {% endif %}
+                    <div class="input-group-append">
+                        <input type="submit" class="btn btn-info" value="Submit">
+                    </div>
+                </div>
+            </div>
+        </form>
+        {% if result is defined %}
+        <div>
+            {% for info in result %}
+            <h3>{{info['url']}}</h3>
+            <hr> {% for line in info['text'] %} {% if (info['type'] == 'rss' or info['type'] == 'atom') %}
+            <p>TITLE -> {{line['title']}}</p>
+            <p>LINK -> {{line['link']}}</p>
+            <p>DATE -> {{line['date']}}</p>
+            <p>DESCRIPTION -> {{line['description']}}</p>
+            {% elif (info['type'] == 'web' or info['type'] == 'twitter') %}
+            <p>TEXT -> {{line['text']}}</p>
+            {% endif %}
+            <hr> {% endfor %} {% endfor %}
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-  </div>
 
 </body>
 

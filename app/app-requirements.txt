@@ -18,3 +18,4 @@ urllib3==1.22
 GoogleAppEngineCloudStorageClient==1.9.22.1
 google-cloud-bigquery==0.29.0
 requests==2.18.4
+pyOpenSSL==17.5.0
