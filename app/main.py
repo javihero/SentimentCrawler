@@ -16,7 +16,7 @@ import cloudstorage as gcs
 from natural_service import NaturalService
 from twitter_service import TwitterService
 from helpers import sanitize_url, request_scrapy, send_to_bq_task
-from bigquery_service import send_scrapper_result_to_bigquery
+# from bigquery_service import send_scrapper_result_to_bigquery
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -42,7 +42,7 @@ gcs.set_default_retry_params(my_default_retry_params)
 local_url = 'http://localhost:9080'
 cloud_url = 'http://35.197.243.127'
 
-current_url = cloud_url
+current_url = local_url
 # [END Scrapy URL]
 
 
@@ -50,7 +50,7 @@ current_url = cloud_url
 class MainPage(webapp2.RequestHandler):
 
     def get(self):
-        
+
         template_values = {
             'content': ''
         }
@@ -71,9 +71,9 @@ class ScrapyRss(webapp2.RequestHandler):
 
         items = request_scrapy(api_url)
 
-        for item in items:
-            send_scrapper_result_to_bigquery(json.dumps(item))
-            #send_to_bq_task(item)
+        # for item in items:
+        # send_scrapper_result_to_bigquery(json.dumps(item))
+        # send_to_bq_task(item)
 
         template_values = {
             'content': items
@@ -116,7 +116,7 @@ class ScrapyWeb(webapp2.RequestHandler):
         info = request_scrapy(api_url)
 
         template_values = {
-            'info': info
+            'content': info
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -129,12 +129,11 @@ class RequestTwitter(webapp2.RequestHandler):
 
     def post(self):
         term = self.request.get('term')
-
         twitter = TwitterService()
-        info = twitter.get_tweets_from(term)
+        info = twitter.search_tweets(term)
 
         template_values = {
-            'info': info
+            'content': info
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
