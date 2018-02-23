@@ -54,14 +54,8 @@
     <div>
       {% for info in result %}
       <h3>{{info['url']}}</h3>
-      <hr> {% for line in info['text'] %} {% if (info['type'] == 'rss' or info['type'] == 'atom') %}
-      <p>TITLE -> {{line['title']}}</p>
-      <p>LINK -> {{line['link']}}</p>
-      <p>DATE -> {{line['date']}}</p>
-      <p>DESCRIPTION -> {{line['description']}}</p>
-      {% elif (info['type'] == 'web' or info['type'] == 'twitter') %}
+      <hr> {% for line in info['text'] %}
       <p>TEXT -> {{line['text']}}</p>
-      {% endif %}
       <hr> {% endfor %} {% endfor %}
     </div>
     {% endif %}

@@ -47,7 +47,7 @@ cloud_url = 'http://35.197.243.127'
 #cloud_url = 'http://35.189.97.130' #account edosoft
 
 
-current_url = cloud_url
+current_url = local_url
 # [END Scrapy URL]
 
 
@@ -55,7 +55,7 @@ current_url = cloud_url
 class MainPage(webapp2.RequestHandler):
 
     def get(self):
-        
+
         template_values = {
             'content': ''
         }
@@ -134,7 +134,7 @@ class ScrapyWeb(webapp2.RequestHandler):
         info = request_scrapy(api_url)
 
         template_values = {
-            'info': info
+            'content': info
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -147,12 +147,11 @@ class RequestTwitter(webapp2.RequestHandler):
 
     def post(self):
         term = self.request.get('term')
-
         twitter = TwitterService()
-        info = twitter.get_tweets_from(term)
+        info = twitter.search_tweets(term)
 
         template_values = {
-            'info': info
+            'content': info
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -285,12 +284,10 @@ class CloudStorage(webapp2.RequestHandler):
 
             if kind_selected == 'twitter':
                 twitter = TwitterService()
-                response = twitter.get_tweets_from(url)
-                info['type'] = 'twitter'
+                response = twitter.search_tweets(url)
             else:
                 api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
                 response = request_scrapy(api_url)
-                info['type'] = spider
 
             info['text'] = response
 

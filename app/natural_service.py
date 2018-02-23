@@ -6,12 +6,18 @@ from natural_config import API_KEY
 
 
 class NaturalService():
+    """
+    Natural Language API calls are made from here
+    """
 
     service = build('language', 'v1',
                     developerKey=API_KEY)
     collection = service.documents()
 
     def request_sentiment(self, text):
+        """
+        Returns text, overall score and magnitude, and a dict with each sentence, specific score and magnitude
+        """
 
         data = {}
         data['document'] = {}

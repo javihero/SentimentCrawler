@@ -58,24 +58,9 @@
     </form>
   </div>
 
-
   {% if content is defined %}
   <div class="container feed">
     {% for item in content %}
-    <hr>
-    <p>TITLE -> {{item['title']}}</p>
-    <p>LINK -> {{item['link']}}</p>
-    <p>DATE -> {{item['date']}}</p>
-    <p>DESCRIPTION -> {{item['description']}}</p>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  </br>
-
-  {% if info is defined %}
-  <div class="container feed">
-    {% for item in info %}
     <hr>
     <p>TEXT -> {{item['text']}}</p>
     {% endfor %}
