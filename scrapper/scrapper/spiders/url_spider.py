@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
-import scrapy
+from scrapy.spider import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 
 
-class WebSpider(scrapy.Spider):
-    name = 'web'
+class UrlSpider(CrawlSpider):
+    name = 'url'
 
-    def parse(self, response):
+    # Last comma is SUPER important - Rule is not an iterable
+    # Depth is in settings.py
+    rules = (Rule(LinkExtractor(), callback='parse_url', follow=True),)
+
+    def parse_url(self, response):
         xpath = '//body//text()[normalize-space() and not(parent::script | parent::style | parent::a)]'
         text_nodes = response.xpath(xpath).extract()
 

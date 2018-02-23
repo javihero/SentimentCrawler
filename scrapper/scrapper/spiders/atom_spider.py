@@ -12,12 +12,12 @@ class AtomSpider(XMLFeedSpider):
         self.logger.info('Hi, this is a <%s> node!: %s',
                          self.itertag, ''.join(node.extract()))
 
-        entry = {}
-        entry['title'] = node.xpath('atom:title/text()',).extract_first()
-        entry['link'] = node.xpath('atom:link/text()').extract_first()
-        entry['date'] = node.xpath('atom:updated/text()').extract_first()
+        # entry['title'] = node.xpath('atom:title/text()',).extract_first()
+        # entry['link'] = node.xpath('atom:link/text()').extract_first()
+        # entry['date'] = node.xpath('atom:updated/text()').extract_first()
 
+        entry = {}
         content = node.xpath('atom:content/text()').extract_first()
-        entry['description'] = sanitize_content(content)
+        entry['text'] = sanitize_content(content)
 
         return entry
