@@ -238,11 +238,9 @@ class CloudStorage(webapp2.RequestHandler):
             if kind_selected == 'twitter':
                 twitter = TwitterService()
                 response = twitter.get_tweets_from(url)
-                info['type'] = 'twitter'
             else:
                 api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
                 response = request_scrapy(api_url)
-                info['type'] = spider
 
             info['text'] = response
 
