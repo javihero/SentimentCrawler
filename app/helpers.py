@@ -1,8 +1,6 @@
 import json
 from google.appengine.api import taskqueue, urlfetch
 
-urlfetch.set_default_fetch_deadline(60)
-
 
 def sanitize_url(old_url):
     if not old_url.startswith(('http://', 'https://')):
@@ -13,6 +11,7 @@ def sanitize_url(old_url):
 
 
 def request_scrapy(api_url):
+    urlfetch.set_default_fetch_deadline(60)
     content = urlfetch.fetch(api_url).content
     json_content = json.loads(content)
     return json_content['items']
