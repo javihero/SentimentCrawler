@@ -42,5 +42,6 @@ def send_to_gstorage(self, filename, content):
     self.tmp_filenames_to_clean_up.append(filename)
 """   
 
-def send_to_bq_task(item):
-        taskqueue.add(url='/send_bq', target='worker', params=item)
+def send_to_bq_task(bq_client, table_ref, job_config, item):
+        taskqueue.add(url='/send_bq', target='worker', params={'bq_client': bq_client, 'table_ref': table_ref, 'job_config': job_config, 'item': item})
+
