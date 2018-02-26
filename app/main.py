@@ -18,8 +18,8 @@ from google.cloud.bigquery import Dataset
 
 from natural_service import NaturalService
 from twitter_service import TwitterService
-from helpers import sanitize_url, request_scrapy, send_to_bq_task
-from bigquery_service import send_scrapper_result_to_bigquery
+from helpers import sanitize_url, request_scrapy, send_to_bq_task, get_dict_datasets_tables
+from bigquery_service import send_scrapper_result_to_bigquery, get_bq_scrapertext, save_sentiment_result_to_bq
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -47,7 +47,7 @@ cloud_url = 'http://35.197.243.127'
 #cloud_url = 'http://35.189.97.130' #account edosoft
 
 
-current_url = local_url
+current_url = cloud_url
 # [END Scrapy URL]
 
 
@@ -166,7 +166,7 @@ class RequestNaturalLanguage(webapp2.RequestHandler):
 
     def get(self):
         
-        dict_datasets_tables = self.get_dict_datasets_tables()
+        dict_datasets_tables = get_dict_datasets_tables()
 
         template_values = {
             'dict_datasets_tables': dict_datasets_tables
@@ -176,42 +176,36 @@ class RequestNaturalLanguage(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
     def post(self):
-        text = self.request.get('text')
+        #text = self.request.get('text')
 
         natural = NaturalService()
 
-        dict_datasets_tables = self.get_dict_datasets_tables()
+        dict_datasets_tables = get_dict_datasets_tables()
         dataset_table_selected = self.request.get('dataset-table')
         dataset_table = str(dataset_table_selected).split(";")
         dataset_selected = dataset_table[0]
         table_selected = dataset_table[1]
 
-        response = natural.request_sentiment(text)
+        # Get scrapy text from dataset table for analyze sentiment
+        rows = get_bq_scrapertext(dataset_selected, table_selected)
 
+        sentiment_result = []
+        for row in rows:
+            for text in row:
+                sentiment_result.append(natural.request_sentiment(text))
+
+        save_sentiment_result_to_bq(dataset_selected, table_selected, sentiment_result)
 
         template_values = {
             'dict_datasets_tables': dict_datasets_tables,
             'dataset_table_selected': dataset_table_selected,
             'dataset_selected': dataset_selected,
-            'table_selected': table_selected,  
-            'content': response
+            'table_selected': table_selected,
+            'sentiment_result': sentiment_result
         }
 
         template = JINJA_ENVIRONMENT.get_template('natural.html')
         self.response.write(template.render(template_values))
-
-    def get_dict_datasets_tables(self):
-        
-        datasets = self.bq_client.list_datasets() # API request(s)
-        dict_datasets_tables = {}
-        for single_dataset in datasets:
-            dataset = bigquery.Dataset(self.bq_client.dataset(single_dataset.dataset_id))
-            dataset_tables = self.bq_client.list_dataset_tables(dataset)
-            dict_datasets_tables[single_dataset.dataset_id] = []
-            for dataset_table in dataset_tables:
-                dict_datasets_tables[single_dataset.dataset_id].append(dataset_table.table_id)
-        
-        return dict_datasets_tables
 
 # [END natural_language]
 

@@ -47,17 +47,18 @@
     <p>DATASET SELECTED: {{dataset_selected}}</p>
     {% endif %} {% if table_selected is defined %}
     <p>TABLE SELECTED: {{table_selected}}</p>
-    {% endif %} {% if content is defined %}
+    {% endif %} {% if sentiment_result is defined %}
     <div class="container feed">
-        <p>Text -> {{content['text']}}</p>
-        <p>Score -> {{content['score']}}</p>
-        <p>Magnitude -> {{content['magnitude']}}</p>
-        {% for sentence in content['sentences'] %}
+        {% for item in sentiment_result %}
+        <p>Text -> {{item['text']}}</p>
+        <p>Score -> {{item['score']}}</p>
+        <p>Magnitude -> {{item['magnitude']}}</p>
+        {% for sentence in item['sentences'] %}
         <hr>
         <p>- Sentence -> {{sentence['text']['content']}}</p>
         <p>-- Score -> {{sentence['sentiment']['score']}}</p>
         <p>-- Magnitude -> {{sentence['sentiment']['magnitude']}}</p>
-        {% endfor %}
+        {% endfor %} {% endfor %}
     </div>
     {% endif %}
 
