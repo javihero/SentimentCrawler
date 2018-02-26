@@ -11,14 +11,4 @@ class UrlSpider(CrawlSpider):
     rules = (Rule(LinkExtractor(), callback='parse_url', follow=True),)
 
     def parse_url(self, response):
-        xpath = '//body//text()[normalize-space() and not(parent::script | parent::style | parent::a)]'
-        text_nodes = response.xpath(xpath).extract()
-
-        formatted_text = (' '.join(text_nodes))
-        phrases = formatted_text.split('. ')
-
-        for p in phrases:
-            if p is not '':
-                yield {
-                    'text': p
-                }
+        yield {'url': response.url}

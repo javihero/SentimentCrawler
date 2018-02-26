@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from scrapper.helpers import sanitize_content
 
 
 class WebSpider(scrapy.Spider):
@@ -15,5 +16,5 @@ class WebSpider(scrapy.Spider):
         for p in phrases:
             if p is not '':
                 yield {
-                    'text': p
+                    'text': sanitize_content(p)
                 }
