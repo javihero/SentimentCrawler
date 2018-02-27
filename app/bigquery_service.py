@@ -3,6 +3,7 @@ from google.cloud import bigquery
 from google.appengine.api import taskqueue
 
 from io import StringIO
+import random, string
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -69,20 +70,26 @@ def save_sentiment_result_to_bq(dataset_selected, table_selected, sentiment_resu
         bigquery.SchemaField('SCORE', 'STRING'),
         bigquery.SchemaField('MAGNITUDE', 'STRING'),
     ]
-    table_ref = dataset_ref.table(
-        str(table_selected) + '_' + 'sentiment_result')
+    random_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(4))
+    table_ref = dataset_ref.table(str(table_selected) + '_' + 'sentiment_result_' + str(random_id))
     table = bigquery.Table(table_ref, schema=SCHEMA)
-    table = bq_client.create_table(table)      # API request
-
+    table = bq_client.create_table(table)
     # [END create_table]
 
     # [START table_insert_rows]
-    row_to_insert_text = [
-        (u'Phred Phlyntstone', '21', '45')
-    ]
+    
+    row_to_insert_sentiment_text = []
+    for text in sentiment_result:
+        text_tuple = (text['text'], text['score'], text['magnitude'])
+        row_to_insert_sentiment_text.append(text_tuple)
+        for sentence in text['sentences']:
+            sentence_tuple = (sentence['text']['content'], sentence['sentiment']['score'], sentence['sentiment']['magnitude'])
+            row_to_insert_sentiment_text.append(sentence_tuple)
 
-    bq_client.insert_rows(table, row_to_insert_text)  # API request
-
-    # logging.info('ERRORS: ' + str(errors))
+    bq_client.insert_rows(table, row_to_insert_sentiment_text)  # API request
 
     # [END table_insert_rows]
+
+
+
+
