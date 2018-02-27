@@ -5,6 +5,7 @@
 
   * 'dev_appserver app.yaml' to serve in localhost
   * 'gcloud app deploy' to submit changes to App Engine
+  * Twitter and Natural Language API have both gitignored config files with keys (put your own)
 
 ## Scrapper
   This folder contains the Scrapy project (crawlers), requires Python 3
