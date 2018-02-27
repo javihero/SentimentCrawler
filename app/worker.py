@@ -54,15 +54,12 @@ class ScrapyUrlHandler(webapp2.RequestHandler):
 
     def post(self):
         url = self.request.get('url')
-        depth = int(self.request.get('counter'))
+        depth = int(self.request.get('depth'))
         api_url = 'http://localhost:9080/crawl.json?spider_name=url&url=' + url
 
         # Fire a task to request text from the caller url
-        # taskqueue.add(url='/request_text',
-        # params={'url': url})
-
-        print 'DEPTH ----------> ' + str(depth)
-        print 'URL ------------> ' + url
+        taskqueue.add(url='/request_text',
+                      params={'url': url})
 
         if depth < 3:
 
@@ -78,8 +75,6 @@ class ScrapyUrlHandler(webapp2.RequestHandler):
                 taskqueue.add(url='/request_urls',
                               params={'url': url, 'depth': depth})
 
-                print 'request created for ' + url
-
 
 class ScrapyTextHandler(webapp2.RequestHandler):
     """
@@ -90,15 +85,17 @@ class ScrapyTextHandler(webapp2.RequestHandler):
         url = self.request.get('url')
         api_url = 'http://localhost:9080/crawl.json?spider_name=web&url=' + url
 
-        print '####################'
-        print url
-        print '####################'
-
         # Returns list of text found
         text = request_scrapy(api_url)
 
+        # Dict { url: '', lines: [] }
+        result = {}
+        result['url'] = url
+        result['lines'] = []
         for line in text:
-            print line
+            result['lines'].append(line)
+
+        # WIP add task to send result to BigQuery
 # [END crawler tasks]
 
 
