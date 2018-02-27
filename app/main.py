@@ -3,26 +3,19 @@
 
 # [START imports]
 import os
+import csv
 
 import jinja2
 import webapp2
 
-import csv
-import json
-
-# Import the Google Cloud Storage Library
-import cloudstorage as gcs
-
 from natural_service import NaturalService
 from twitter_service import TwitterService
 from helpers import sanitize_url, request_scrapy
+
+import cloudstorage as gcs
 from google.appengine.api import taskqueue
-# from bigquery_service import send_scrapper_result_to_bigquery
-# Import the Google Cloud BigQuery Library
 from google.cloud import bigquery
-from google.cloud.bigquery import Dataset
-from helpers import send_to_bq_task, get_dict_datasets_tables
-from bigquery_service import send_scrapper_result_to_bigquery, get_bq_scrapertext, save_sentiment_result_to_bq
+from bigquery_service import get_bq_scrapertext, save_sentiment_result_to_bq, get_dict_datasets_tables
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -48,7 +41,6 @@ gcs.set_default_retry_params(my_default_retry_params)
 local_url = 'http://localhost:9080'
 cloud_url = 'http://35.197.243.127'
 # cloud_url = 'http://35.189.97.130' #account edosoft
-
 
 current_url = cloud_url
 # [END Scrapy URL]
@@ -78,23 +70,6 @@ class ScrapyRss(webapp2.RequestHandler):
         api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
 
         items = request_scrapy(api_url)
-
-        # --- Bq config --- #
-
-        dataset_name = 'sentimentcrawlerdataset'
-        table_id = 'scrapper_table'
-
-        bq_client = bigquery.Client()
-        dataset_ref = bq_client.dataset(dataset_name)
-        table_ref = dataset_ref.table(table_id)
-
-        job_config = bigquery.LoadJobConfig()
-        job_config.source_format = 'NEWLINE_DELIMITED_JSON'
-        job_config.autodetect = True
-
-        for item in items:
-            send_scrapper_result_to_bigquery(json.dumps(item))
-            #send_to_bq_task(bq_client, table_ref, job_config, item)
 
         template_values = {
             'content': items
@@ -321,7 +296,7 @@ app = webapp2.WSGIApplication([
     ('/atom', ScrapyAtom),
     ('/web', ScrapyWeb),
     ('/twitter', RequestTwitter),
-    ('/gcs', CloudStorage),
+    ('/gcs', CloudStorage)
     ('/natural', RequestNaturalLanguage)
 ], debug=True)
 # [END app]
