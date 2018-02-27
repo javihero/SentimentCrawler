@@ -12,13 +12,17 @@ import json
 
 # Import the Google Cloud Storage Library
 import cloudstorage as gcs
-from google.appengine.api import urlfetch
 
 from natural_service import NaturalService
 from twitter_service import TwitterService
 from helpers import sanitize_url, request_scrapy
 from google.appengine.api import taskqueue
 # from bigquery_service import send_scrapper_result_to_bigquery
+# Import the Google Cloud BigQuery Library
+from google.cloud import bigquery
+from google.cloud.bigquery import Dataset
+from helpers import send_to_bq_task, get_dict_datasets_tables
+from bigquery_service import send_scrapper_result_to_bigquery, get_bq_scrapertext, save_sentiment_result_to_bq
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -43,8 +47,10 @@ gcs.set_default_retry_params(my_default_retry_params)
 # [START Scrapy URL]
 local_url = 'http://localhost:9080'
 cloud_url = 'http://35.197.243.127'
+# cloud_url = 'http://35.189.97.130' #account edosoft
 
-current_url = local_url
+
+current_url = cloud_url
 # [END Scrapy URL]
 
 
@@ -72,6 +78,23 @@ class ScrapyRss(webapp2.RequestHandler):
         api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
 
         items = request_scrapy(api_url)
+
+        # --- Bq config --- #
+
+        dataset_name = 'sentimentcrawlerdataset'
+        table_id = 'scrapper_table'
+
+        bq_client = bigquery.Client()
+        dataset_ref = bq_client.dataset(dataset_name)
+        table_ref = dataset_ref.table(table_id)
+
+        job_config = bigquery.LoadJobConfig()
+        job_config.source_format = 'NEWLINE_DELIMITED_JSON'
+        job_config.autodetect = True
+
+        for item in items:
+            send_scrapper_result_to_bigquery(json.dumps(item))
+            #send_to_bq_task(bq_client, table_ref, job_config, item)
 
         template_values = {
             'content': items
@@ -115,7 +138,6 @@ class ScrapyWeb(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render())
-
 # [END scrapy_web]
 
 
@@ -139,20 +161,47 @@ class RequestTwitter(webapp2.RequestHandler):
 # [START natural_language]
 class RequestNaturalLanguage(webapp2.RequestHandler):
 
+    bq_client = bigquery.Client()
+
     def get(self):
-        template_values = {}
+
+        dict_datasets_tables = get_dict_datasets_tables()
+
+        template_values = {
+            'dict_datasets_tables': dict_datasets_tables
+        }
 
         template = JINJA_ENVIRONMENT.get_template('natural.html')
         self.response.write(template.render(template_values))
 
     def post(self):
-        text = self.request.get('text')
+        # text = self.request.get('text')
 
         natural = NaturalService()
-        response = natural.request_sentiment(text)
+
+        dict_datasets_tables = get_dict_datasets_tables()
+        dataset_table_selected = self.request.get('dataset-table')
+        dataset_table = str(dataset_table_selected).split(";")
+        dataset_selected = dataset_table[0]
+        table_selected = dataset_table[1]
+
+        # Get scrapy text from dataset table for analyze sentiment
+        rows = get_bq_scrapertext(dataset_selected, table_selected)
+
+        sentiment_result = []
+        for row in rows:
+            for text in row:
+                sentiment_result.append(natural.request_sentiment(text))
+
+        save_sentiment_result_to_bq(
+            dataset_selected, table_selected, sentiment_result)
 
         template_values = {
-            'content': response
+            'dict_datasets_tables': dict_datasets_tables,
+            'dataset_table_selected': dataset_table_selected,
+            'dataset_selected': dataset_selected,
+            'table_selected': table_selected,
+            'sentiment_result': sentiment_result
         }
 
         template = JINJA_ENVIRONMENT.get_template('natural.html')
@@ -164,26 +213,23 @@ class RequestNaturalLanguage(webapp2.RequestHandler):
 class CloudStorage(webapp2.RequestHandler):
 
     buck_name = 'urlbucket'
-    brands_file_name = 'brands.csv'
+    # buck_name = 'crawlsentbucket' #account edosoft
     media_file_name = 'medios.csv'
     bucket_name = os.environ.get('BUCKET_NAME', buck_name)
     kinds = ['website', 'rss', 'twitter']
 
     bucket = '/' + bucket_name
-    brands_filename = bucket + '/' + brands_file_name
     media_filename = bucket + '/' + media_file_name
     tmp_filenames_to_clean_up = []
 
     def get(self):
 
         try:
-            brands = self.read_file(self.brands_filename)
             medios = self.read_file(self.media_filename)
         except Exception, e:
             self.response.write(e)
 
         template_values = {
-            'brands': brands,
             'medios': medios,
             'tipos': self.kinds
         }
@@ -194,12 +240,10 @@ class CloudStorage(webapp2.RequestHandler):
     def post(self):
 
         try:
-            brands = self.read_file(self.brands_filename)
             medios = self.read_file(self.media_filename)
         except Exception, e:
             self.response.write(e)
 
-        # brand_selected = self.request.get('brand')
         medio_selected = self.request.get('medio')
         kind_selected = self.request.get('kind')
 
@@ -215,6 +259,7 @@ class CloudStorage(webapp2.RequestHandler):
             spider = 'rss'
         else:
             url_file_name = 'twitter.csv'
+            # url_file_name = 'twitter_search.csv' #account edosoft
 
         url_filename = self.bucket + '/' + url_file_name
 
@@ -232,7 +277,7 @@ class CloudStorage(webapp2.RequestHandler):
 
             if kind_selected == 'twitter':
                 twitter = TwitterService()
-                response = twitter.get_tweets_from(url)
+                response = twitter.search_tweets(url)
             else:
                 api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
                 response = request_scrapy(api_url)
@@ -244,7 +289,6 @@ class CloudStorage(webapp2.RequestHandler):
         # Render result
 
         template_values = {
-            'brands': brands,
             'medios': medios,
             'tipos': self.kinds,
             'result': result
@@ -267,7 +311,6 @@ class CloudStorage(webapp2.RequestHandler):
             if (medio_selected == str(row[1]).decode('utf-8')):
                 yield str(row[0]).decode('utf-8')
         gcs_file.close()
-
 # [END brands]
 
 
