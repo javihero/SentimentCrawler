@@ -12,10 +12,12 @@ import json
 
 # Import the Google Cloud Storage Library
 import cloudstorage as gcs
+from google.appengine.api import urlfetch
 
 from natural_service import NaturalService
 from twitter_service import TwitterService
-from helpers import sanitize_url, request_scrapy, send_to_bq_task
+from helpers import sanitize_url, request_scrapy
+from google.appengine.api import taskqueue
 # from bigquery_service import send_scrapper_result_to_bigquery
 
 import logging
@@ -71,10 +73,6 @@ class ScrapyRss(webapp2.RequestHandler):
 
         items = request_scrapy(api_url)
 
-        # for item in items:
-        # send_scrapper_result_to_bigquery(json.dumps(item))
-        # send_to_bq_task(item)
-
         template_values = {
             'content': items
         }
@@ -110,17 +108,14 @@ class ScrapyWeb(webapp2.RequestHandler):
     def post(self):
         url = self.request.get('url')
         url = sanitize_url(url)
-        spider = 'web'
-        api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
 
-        info = request_scrapy(api_url)
-
-        template_values = {
-            'content': info
-        }
+        # Request text and urls from the 1st url
+        taskqueue.add(url='/request_crawler', target='worker',
+                      params={'url': url})
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render(template_values))
+        self.response.write(template.render())
+
 # [END scrapy_web]
 
 

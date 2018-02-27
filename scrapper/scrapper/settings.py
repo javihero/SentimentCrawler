@@ -16,7 +16,7 @@ NEWSPIDER_MODULE = 'scrapper.spiders'
 
 FEED_EXPORT_ENCODING = 'utf-8'
 
-DEPTH_LIMIT = 3  # Crawling depth, will stop at 3rd level
+DEPTH_LIMIT = 1  # Crawling depth
 AUTOTHROTTLE_ENABLED = True  # This will prevent aggressive crawling
 
 
