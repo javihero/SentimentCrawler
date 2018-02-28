@@ -41,3 +41,10 @@ def send_result_to_storage(self, data):
 
     gcs_file.close()
     self.tmp_filenames_to_clean_up.append(filename)
+
+
+def delete_sentiment_file(self):
+    bucket_name = 'urlbucket'
+    bucket = '/' + bucket_name
+    filename = bucket + '/sentiment_result.json'
+    gcs.delete(filename)

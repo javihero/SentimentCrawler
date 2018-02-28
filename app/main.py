@@ -16,7 +16,7 @@ import cloudstorage as gcs
 from google.appengine.api import taskqueue
 from google.cloud import bigquery
 from bigquery_service import send_result_to_bigquery, get_bq_scrapertext, save_sentiment_result_to_bq, get_dict_datasets_tables
-from storage_service import send_result_to_storage
+from storage_service import send_result_to_storage, delete_sentiment_file
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -174,6 +174,8 @@ class RequestNaturalLanguage(webapp2.RequestHandler):
 
         save_sentiment_result_to_bq(
             dataset_selected, table_selected)
+
+        delete_sentiment_file(self) 
 
         template_values = {
             'dict_datasets_tables': dict_datasets_tables,
