@@ -5,8 +5,6 @@ from google.appengine.api import taskqueue
 from io import StringIO
 import random, string
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
 
 
 def send_to_bq_task(bq_client, table_ref, job_config, item):
@@ -32,19 +30,23 @@ def get_dict_datasets_tables():
 
 def send_result_to_bigquery(dataset, table, data):
 
-    dataset_name = dataset
-    table_id = table
+    bq_client = bigquery.Client()
+    dataset_ref = bq_client.dataset(dataset)
 
-    bigquery_client = bigquery.Client()
-    dataset_ref = bigquery_client.dataset(dataset_name)
-    table_ref = dataset_ref.table(table_id)
+    SCHEMA = [
+        bigquery.SchemaField('TEXT', 'STRING')
+    ]
+
+    table_ref = dataset_ref.table(table)
+    table = bigquery.Table(table_ref, schema=SCHEMA)
+    table = bq_client.create_table(table)
 
     job_config = bigquery.LoadJobConfig()
     job_config.source_format = 'NEWLINE_DELIMITED_JSON'
     job_config.autodetect = True
 
     # load_job = bigquery_client.load_table_from_uri('https://storage.cloud.google.com' + source_file_name, table_ref, job_config=job_config)  # API request
-    load_job = bigquery_client.load_table_from_file(
+    load_job = bq_client.load_table_from_file(
         StringIO(unicode(data)), table_ref, job_config=job_config)  # API request
 
     load_job.result()  # Waits for table load to complete.

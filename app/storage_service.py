@@ -4,8 +4,7 @@
 import cloudstorage as gcs
 from google.appengine.api import app_identity
 import os, json
-import logging
-logging.basicConfig(level=logging.DEBUG)
+
 #[END imports]
 
 #[START retries]

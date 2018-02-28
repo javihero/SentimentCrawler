@@ -17,9 +17,8 @@ from google.appengine.api import taskqueue
 from google.cloud import bigquery
 from bigquery_service import send_result_to_bigquery, get_bq_scrapertext, save_sentiment_result_to_bq, get_dict_datasets_tables
 from storage_service import send_result_to_storage, delete_sentiment_file
+import random, string, json
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -40,8 +39,7 @@ gcs.set_default_retry_params(my_default_retry_params)
 
 # [START Scrapy URL]
 local_url = 'http://localhost:9080'
-cloud_url = 'http://35.197.243.127'
-# cloud_url = 'http://35.189.97.130' #account edosoft
+cloud_url = 'http://35.189.79.165'
 
 current_url = cloud_url
 # [END Scrapy URL]
@@ -219,6 +217,7 @@ class CloudStorage(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
     def post(self):
+        
 
         try:
             medios = self.read_file(self.media_filename)
@@ -243,7 +242,6 @@ class CloudStorage(webapp2.RequestHandler):
             # url_file_name = 'twitter_search.csv' #account edosoft
 
         url_filename = self.bucket + '/' + url_file_name
-
         try:
             urls = self.read_urls_file(url_filename, medio_selected)
         except Exception, e:
@@ -251,11 +249,8 @@ class CloudStorage(webapp2.RequestHandler):
 
         # Request loop
 
-        result = []
+        result = ''
         for url in urls:
-            info = {}
-            info['url'] = url
-
             if kind_selected == 'twitter':
                 twitter = TwitterService()
                 response = twitter.search_tweets(url)
@@ -263,14 +258,17 @@ class CloudStorage(webapp2.RequestHandler):
                 api_url = current_url + '/crawl.json?spider_name=' + spider + '&url=' + url
                 response = request_scrapy(api_url)
 
-            info['text'] = response
+            for line in response:
+                line = json.dumps(line)
+                result = result + line + '\n'
 
-            result.append(info)
 
-        #-------SEND SCRAPER RESULTO TO BQ----------#
-        #dataset = 'sentimentcrawlerdataset'
-        #table = medio_selected + '_' + kind_selected + '_' + 'scraper'
-        #send_result_to_bigquery(dataset, table, result)
+        #-------SEND SCRAPER RESULT TO BQ----------#
+        dataset = 'sentimentcrawlerdataset'
+        random_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(4))
+        table = medio_selected + '_' + kind_selected + '_' + 'scraper' + '_' + str(random_id)
+        table = table.replace(' ', '').lower()
+        send_result_to_bigquery(dataset, table, result)
 
         # Render result
 
