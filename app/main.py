@@ -15,7 +15,8 @@ from helpers import sanitize_url, request_scrapy
 import cloudstorage as gcs
 from google.appengine.api import taskqueue
 from google.cloud import bigquery
-from bigquery_service import get_bq_scrapertext, save_sentiment_result_to_bq, get_dict_datasets_tables
+from bigquery_service import send_result_to_bigquery, get_bq_scrapertext, save_sentiment_result_to_bq, get_dict_datasets_tables
+from storage_service import send_result_to_storage
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -168,8 +169,11 @@ class RequestNaturalLanguage(webapp2.RequestHandler):
             for text in row:
                 sentiment_result.append(natural.request_sentiment(text))
 
+        
+        send_result_to_storage(self, sentiment_result)
+
         save_sentiment_result_to_bq(
-            dataset_selected, table_selected, sentiment_result)
+            dataset_selected, table_selected)
 
         template_values = {
             'dict_datasets_tables': dict_datasets_tables,
@@ -261,6 +265,11 @@ class CloudStorage(webapp2.RequestHandler):
 
             result.append(info)
 
+        #-------SEND SCRAPER RESULTO TO BQ----------#
+        #dataset = 'sentimentcrawlerdataset'
+        #table = medio_selected + '_' + kind_selected + '_' + 'scraper'
+        #send_result_to_bigquery(dataset, table, result)
+
         # Render result
 
         template_values = {
@@ -296,7 +305,7 @@ app = webapp2.WSGIApplication([
     ('/atom', ScrapyAtom),
     ('/web', ScrapyWeb),
     ('/twitter', RequestTwitter),
-    ('/gcs', CloudStorage)
+    ('/gcs', CloudStorage),
     ('/natural', RequestNaturalLanguage)
 ], debug=True)
 # [END app]

@@ -41,13 +41,14 @@
         </form>
     </div>
 
-    {% if dataset_table_selected is defined %}
-    <p>DATASET TABLE SELECTED: {{dataset_table_selected}}</p>
-    {% endif %} {% if dataset_selected is defined %}
-    <p>DATASET SELECTED: {{dataset_selected}}</p>
-    {% endif %} {% if table_selected is defined %}
-    <p>TABLE SELECTED: {{table_selected}}</p>
-    {% endif %} {% if sentiment_result is defined %}
+    <div class="container">
+        {% if dataset_selected is defined %}
+        <p>DATASET SELECTED: {{dataset_selected}}</p>
+        {% endif %} {% if table_selected is defined %}
+        <p>TABLE SELECTED: {{table_selected}}</p>
+        {% endif %}
+    </div>
+    {% if sentiment_result is defined %}
     <div class="container feed">
         {% for item in sentiment_result %}
         <p>Text -> {{item['text']}}</p>

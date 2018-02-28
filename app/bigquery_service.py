@@ -30,10 +30,10 @@ def get_dict_datasets_tables():
     return dict_datasets_tables
 
 
-def send_scrapper_result_to_bigquery(data):
+def send_result_to_bigquery(dataset, table, data):
 
-    dataset_name = 'sentimentcrawlerdataset'
-    table_id = 'scrapper_table'
+    dataset_name = dataset
+    table_id = table
 
     bigquery_client = bigquery.Client()
     dataset_ref = bigquery_client.dataset(dataset_name)
@@ -59,16 +59,16 @@ def get_bq_scrapertext(dataset, table):
 
     return rows
 
-
-def save_sentiment_result_to_bq(dataset_selected, table_selected, sentiment_result):
+def save_sentiment_result_to_bq(dataset_selected, table_selected):
     bq_client = bigquery.Client()
     dataset_ref = bq_client.dataset(dataset_selected)
+
 
     # [START create_table for sentiment result]
     SCHEMA = [
         bigquery.SchemaField('TEXT', 'STRING'),
-        bigquery.SchemaField('SCORE', 'STRING'),
-        bigquery.SchemaField('MAGNITUDE', 'STRING'),
+        bigquery.SchemaField('SCORE', 'FLOAT'),
+        bigquery.SchemaField('MAGNITUDE', 'FLOAT')
     ]
     random_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(4))
     table_ref = dataset_ref.table(str(table_selected) + '_' + 'sentiment_result_' + str(random_id))
@@ -76,19 +76,14 @@ def save_sentiment_result_to_bq(dataset_selected, table_selected, sentiment_resu
     table = bq_client.create_table(table)
     # [END create_table]
 
-    # [START table_insert_rows]
-    
-    row_to_insert_sentiment_text = []
-    for text in sentiment_result:
-        text_tuple = (text['text'], text['score'], text['magnitude'])
-        row_to_insert_sentiment_text.append(text_tuple)
-        for sentence in text['sentences']:
-            sentence_tuple = (sentence['text']['content'], sentence['sentiment']['score'], sentence['sentiment']['magnitude'])
-            row_to_insert_sentiment_text.append(sentence_tuple)
+    job_config = bigquery.LoadJobConfig()
+    job_config.autodetect = True
+    job_config.source_format = 'NEWLINE_DELIMITED_JSON'
 
-    bq_client.insert_rows(table, row_to_insert_sentiment_text)  # API request
 
-    # [END table_insert_rows]
+    # Load sentiment result file from storage
+    job = bq_client.load_table_from_uri('gs://urlbucket/sentiment_result.json', table_ref, job_config=job_config)
+    job.result()
 
 
 
